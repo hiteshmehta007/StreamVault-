@@ -1,0 +1,365 @@
+/* Queue component styles with invisible scrollbar */
+.scrollbar-hide {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
+}
+
+/* Main queue container with dynamic theming */
+.queue-main-container {
+  background: var(--queue-main-bg, rgba(255, 255, 255, 0.02)) !important;
+  border-color: var(--queue-main-border, rgba(255, 255, 255, 0.08)) !important;
+}
+
+/* Queue header border styling */
+.queue-header-border {
+  border-bottom-color: var(--queue-header-border, rgba(255, 255, 255, 0.08)) !important;
+}
+
+/* Subtle queue container with elegant design */
+.queue-container {
+  scroll-behavior: smooth;
+  position: relative;
+  background: var(--queue-container-bg, rgba(255, 255, 255, 0.02));
+  border-radius: 8px;
+  border: 1px solid var(--queue-container-border, rgba(255, 255, 255, 0.08));
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  animation: subtleFadeIn 0.8s ease-out;
+  transition: all 0.4s ease;
+  /* Height calculation: 6 items × (72px item height + 12px gap) = 504px, minus last gap = 492px, plus container padding (24px) = 516px */
+  max-height: 480px;
+}
+
+.queue-container:hover {
+  border-color: rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* Subtle queue item animations */
+.queue-item {
+  transition: all 0.25s ease;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid transparent;
+  position: relative;
+  min-height: 72px; /* Increased height for better text spacing */
+  padding: 12px; /* Ensure consistent padding */
+}
+
+.queue-item:hover {
+  background: var(--queue-hover-bg, rgba(255, 255, 255, 0.04));
+  border-color: var(--queue-border-hover, rgba(255, 255, 255, 0.08));
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.queue-item:active {
+  transform: translateY(0);
+  transition: all 0.1s ease;
+}
+
+/* Gentle staggered animation for queue items */
+.queue-item:nth-child(1) { animation: itemFadeIn 0.6s ease-out 0.1s both; }
+.queue-item:nth-child(2) { animation: itemFadeIn 0.6s ease-out 0.15s both; }
+.queue-item:nth-child(3) { animation: itemFadeIn 0.6s ease-out 0.2s both; }
+.queue-item:nth-child(4) { animation: itemFadeIn 0.6s ease-out 0.25s both; }
+.queue-item:nth-child(5) { animation: itemFadeIn 0.6s ease-out 0.3s both; }
+
+/* Subtle queue number badge */
+.queue-number {
+  transition: all 0.2s ease;
+  background: var(--queue-number-bg, rgba(99, 102, 241, 0.1));
+  border: 1px solid var(--queue-number-border, rgba(99, 102, 241, 0.2));
+  color: var(--queue-number-color, rgba(99, 102, 241, 0.8));
+}
+
+.queue-item:hover .queue-number {
+  background: var(--queue-number-hover-bg, rgba(99, 102, 241, 0.15));
+  border-color: var(--queue-number-hover-border, rgba(99, 102, 241, 0.3));
+  color: var(--queue-number-hover-color, rgb(99, 102, 241));
+  transform: scale(1.05);
+}
+
+/* Active/Currently Playing Queue Item Styles */
+.queue-item.queue-item-active {
+  background: var(--queue-hover-bg, rgba(99, 102, 241, 0.08)) !important;
+  border-color: var(--queue-border-hover, rgba(99, 102, 241, 0.25)) !important;
+  box-shadow: 
+    0 0 0 2px var(--ring-color, rgba(99, 102, 241, 0.3)),
+    0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: scale(1.02);
+}
+
+.queue-item-active .queue-number {
+  background: var(--queue-number-bg) !important;
+  color: white !important;
+  border-color: var(--queue-number-bg) !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Now Playing Badge Animation */
+.queue-now-playing-badge {
+  animation: nowPlayingPulse 2s ease-in-out infinite;
+}
+
+@keyframes nowPlayingPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.98); }
+}
+
+/* Active Item Title Styling */
+.queue-item-active h4 {
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Subtle video thumbnail hover effects */
+.queue-item img {
+  transition: all 0.2s ease;
+  border-radius: 4px;
+}
+
+.queue-item:hover img {
+  filter: brightness(1.05);
+}
+
+/* Subtle queue header animation */
+.queue-header {
+  animation: subtleFadeIn 0.8s ease-out;
+}
+
+/* Gentle remove button animations */
+.remove-button {
+  transition: all 0.2s ease;
+  opacity: 0;
+}
+
+.queue-item:hover .remove-button {
+  opacity: 1;
+}
+
+.remove-button:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: rgb(239, 68, 68);
+}
+
+/* Loading state for queue items */
+.queue-item-loading {
+  animation: pulse 1.5s ease-in-out infinite alternate;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 25%, rgba(255, 255, 255, 0.1) 50%, rgba(255, 255, 255, 0.05) 75%);
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+/* Subtle keyframe animations */
+@keyframes subtleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes itemFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes loading-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+/* Gentle entrance animation for new queue items */
+.queue-item-enter {
+  animation: itemEnter 0.3s ease-out;
+}
+
+@keyframes itemEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth exit animation for removed items */
+.queue-item-exit {
+  animation: itemExit 0.25s ease-in forwards;
+}
+
+@keyframes itemExit {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+/* Responsive hover effects */
+@media (hover: hover) {
+  .queue-item:hover {
+    cursor: pointer;
+  }
+}
+
+/* Text spacing and overflow prevention */
+.queue-item h4 {
+  line-height: 1.3;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.queue-item p,
+.queue-item div {
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Ensure proper spacing between text elements */
+.queue-item .text-xs + .text-xs {
+  margin-top: 4px;
+}
+
+/* Focus states for accessibility */
+.queue-item:focus {
+  outline: 2px solid rgba(59, 130, 246, 0.6);
+  outline-offset: 2px;
+}
+
+.remove-button:focus {
+  outline: 2px solid rgba(239, 68, 68, 0.6);
+  outline-offset: 2px;
+}
+
+/* ===== DRAG AND DROP STYLES ===== */
+
+/* Drag handle styles */
+.drag-handle {
+  transition: all 0.2s ease;
+  opacity: 0.4;
+  border-radius: 4px;
+}
+
+.queue-item:hover .drag-handle {
+  opacity: 0.8;
+  background-color: rgba(156, 163, 175, 0.1);
+}
+
+.drag-handle:hover {
+  background-color: rgba(156, 163, 175, 0.2) !important;
+  opacity: 1 !important;
+}
+
+/* Queue item being dragged */
+.queue-item.dragging {
+  opacity: 0.5;
+  transform: scale(0.95);
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  border: 2px dashed rgba(59, 130, 246, 0.5);
+}
+
+/* Drop target highlighting */
+.queue-item.drag-over {
+  border: 2px solid rgba(59, 130, 246, 0.6) !important;
+  background-color: rgba(59, 130, 246, 0.05) !important;
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+}
+
+/* Dark mode specific drag styles */
+.dark .queue-item.drag-over {
+  background-color: rgba(59, 130, 246, 0.1) !important;
+  border-color: rgba(59, 130, 246, 0.7) !important;
+}
+
+.dark .drag-handle:hover {
+  background-color: rgba(75, 85, 99, 0.3) !important;
+}
+
+/* Drag feedback animation */
+@keyframes dragFeedback {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.queue-item.drag-start {
+  animation: dragFeedback 0.3s ease-out;
+}
+
+/* Drop zone indicator */
+.queue-container.drag-active {
+  border-color: rgba(59, 130, 246, 0.6) !important;
+  background-color: rgba(59, 130, 246, 0.02) !important;
+}
+
+.queue-container.drag-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 2px dashed rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  pointer-events: none;
+  animation: dashAnimation 2s linear infinite;
+}
+
+@keyframes dashAnimation {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+/* Drag cursor */
+.queue-item[draggable="true"] {
+  cursor: grab;
+}
+
+.queue-item[draggable="true"]:active {
+  cursor: grabbing;
+}
+
+/* Smooth transitions during reordering */
+.queue-item {
+  transition: transform 0.3s ease, opacity 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ===== END DRAG AND DROP STYLES ===== */

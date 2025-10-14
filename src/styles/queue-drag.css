@@ -1,0 +1,92 @@
+/* Queue Drag and Drop Styles */
+
+/* Base drag styling */
+.queue-item[draggable="true"] {
+  user-select: none;
+  cursor: move;
+  transition: all 0.2s ease;
+}
+
+/* Dragging State */
+.queue-item.dragging {
+  opacity: 0.6;
+  transform: scale(1.05) rotate(2deg);
+  z-index: 1000;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Drop Target Visual Feedback */
+.queue-item.drop-target {
+  border: 2px dashed var(--queue-border-hover, rgba(99, 102, 241, 0.4)) !important;
+  background: var(--queue-hover-bg, rgba(99, 102, 241, 0.05)) !important;
+  transform: translateY(-2px);
+  animation: dropTargetPulse 1s ease-in-out infinite;
+}
+
+@keyframes dropTargetPulse {
+  0%, 100% { 
+    border-opacity: 0.4; 
+    background-opacity: 0.05;
+  }
+  50% { 
+    border-opacity: 0.8; 
+    background-opacity: 0.1;
+  }
+}
+
+/* Drag Handle Styling */
+.drag-handle {
+  opacity: 0.3;
+  transition: opacity 0.2s ease;
+  cursor: grab;
+  color: currentColor;
+}
+
+.queue-item:hover .drag-handle {
+  opacity: 0.7;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Prevent text selection during drag */
+.queue-item.dragging,
+.queue-item.dragging * {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+}
+
+/* Smooth reordering animation */
+.queue-item {
+  transition: transform 0.2s ease, opacity 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Mobile Touch Improvements */
+@media (max-width: 768px) {
+  .drag-handle {
+    opacity: 0.6;
+    transform: scale(1.2);
+  }
+  
+  .queue-item[draggable="true"] {
+    padding: 16px 12px;
+  }
+  
+  .queue-item.dragging {
+    transform: scale(1.08) rotate(3deg);
+  }
+}
+
+/* Accessibility improvements */
+.queue-item[draggable="true"]:focus {
+  outline: 2px solid var(--queue-border-hover, rgba(99, 102, 241, 0.6));
+  outline-offset: 2px;
+}
+
+/* Visual feedback for drag start */
+.queue-item[draggable="true"]:active {
+  transform: scale(0.98);
+}

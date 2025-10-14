@@ -1,0 +1,426 @@
+/* Glassmorphism MiniPlayer Styles */
+
+.glassmorphism-miniplayer {
+  /* Glassmorphism Base */
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1) 0%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    0 4px 16px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  
+  /* Smooth transitions */
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+  position: relative;
+}
+
+.glassmorphism-miniplayer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+}
+
+.glassmorphism-miniplayer:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 
+    0 16px 48px rgba(0, 0, 0, 0.15),
+    0 8px 24px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.glassmorphism-miniplayer.dragging {
+  transform: rotate(2deg) scale(1.05);
+}
+
+/* Additional utility classes for inline style replacements */
+.glassmorphism-loading-overlay {
+  background: rgba(0, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.glassmorphism-enhanced-indicator {
+  background: linear-gradient(135deg, #ff8a65, #ffb74d);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 16px rgba(255, 138, 101, 0.4);
+}
+
+.glassmorphism-video-element {
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background-color: #000;
+}
+
+.glassmorphism-progress-fill-gradient {
+  width: 100%;
+}
+
+.glassmorphism-volume-percentage {
+  width: 100%;
+}
+
+.glassmorphism-drag-indicator {
+  background: linear-gradient(90deg, #ff8a65, #ffb74d);
+}
+
+.glassmorphism-opacity-control {
+  opacity: 0.6;
+}
+
+.glassmorphism-opacity-low {
+  opacity: 0.3;
+}
+
+/* Warm Color Palette */
+:root {
+  --warm-orange: #ff8a65;
+  --warm-amber: #ffb74d;
+  --warm-rose: #f48fb1;
+  --warm-coral: #ff7043;
+  --warm-peach: #ffab91;
+  --warm-gradient: linear-gradient(135deg, #ff8a65 0%, #ffb74d 50%, #f48fb1 100%);
+  --warm-gradient-subtle: linear-gradient(135deg, rgba(255, 138, 101, 0.1) 0%, rgba(255, 183, 77, 0.1) 50%, rgba(244, 143, 177, 0.1) 100%);
+}
+
+/* Thumbnail Container */
+.glassmorphism-thumbnail {
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glassmorphism-thumbnail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--warm-gradient-subtle);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glassmorphism-thumbnail:hover::after {
+  opacity: 1;
+}
+
+/* Play Button Overlay */
+.glassmorphism-play-overlay {
+  background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.glassmorphism-play-overlay:hover {
+  background: var(--warm-gradient);
+  transform: scale(1.1);
+  box-shadow: 0 8px 24px rgba(255, 138, 101, 0.4);
+}
+
+/* Progress Bar */
+.glassmorphism-progress {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glassmorphism-progress-fill {
+  background: var(--warm-gradient);
+  height: 100%;
+  border-radius: 8px;
+  position: relative;
+  transition: width 0.2s ease;
+  box-shadow: 0 0 12px rgba(255, 138, 101, 0.3);
+}
+
+.glassmorphism-progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+}
+
+.glassmorphism-progress:hover .glassmorphism-progress-fill {
+  box-shadow: 0 0 20px rgba(255, 138, 101, 0.5);
+}
+
+/* Control Buttons */
+.glassmorphism-control-btn {
+  background: rgba(255, 255, 255, 0.1);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.glassmorphism-control-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: var(--warm-gradient);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.glassmorphism-control-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(255, 138, 101, 0.2);
+  border-color: rgba(255, 138, 101, 0.4);
+}
+
+.glassmorphism-control-btn:hover::before {
+  opacity: 0.1;
+}
+
+.glassmorphism-control-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 8px rgba(255, 138, 101, 0.3);
+}
+
+.glassmorphism-control-btn svg {
+  position: relative;
+  z-index: 1;
+  transition: color 0.3s ease;
+}
+
+.glassmorphism-control-btn:hover svg {
+  color: white;
+}
+
+/* Primary Control Button (Play/Pause) */
+.glassmorphism-control-btn.primary {
+  background: var(--warm-gradient);
+  border-color: rgba(255, 138, 101, 0.4);
+  color: white;
+  box-shadow: 0 4px 16px rgba(255, 138, 101, 0.3);
+}
+
+.glassmorphism-control-btn.primary:hover {
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 8px 24px rgba(255, 138, 101, 0.4);
+}
+
+/* Volume Slider */
+.glassmorphism-volume-slider {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 12px;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+.glassmorphism-volume-track {
+  background: rgba(255, 255, 255, 0.2);
+  height: 4px;
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+
+.glassmorphism-volume-fill {
+  background: var(--warm-gradient);
+  height: 100%;
+  border-radius: 2px;
+  position: relative;
+  transition: width 0.2s ease;
+}
+
+.glassmorphism-volume-fill::after {
+  content: '';
+  position: absolute;
+  right: -6px;
+  top: -4px;
+  width: 12px;
+  height: 12px;
+  background: var(--warm-gradient);
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(255, 138, 101, 0.4);
+  transition: all 0.2s ease;
+}
+
+.glassmorphism-volume-track:hover .glassmorphism-volume-fill::after {
+  transform: scale(1.2);
+  box-shadow: 0 3px 12px rgba(255, 138, 101, 0.6);
+}
+
+/* Text Elements */
+.glassmorphism-text {
+  color: rgba(255, 255, 255, 0.9);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.glassmorphism-text.secondary {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.glassmorphism-text.accent {
+  background: var(--warm-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+}
+
+/* Info Panel */
+.glassmorphism-info-panel {
+  background: rgba(0, 0, 0, 0.2);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 16px;
+  margin: 8px;
+}
+
+/* Floating Animation */
+@keyframes floating {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+.glassmorphism-miniplayer.floating {
+  animation: floating 4s ease-in-out infinite;
+}
+
+/* Pulse Animation for Active State */
+@keyframes warm-pulse {
+  0%, 100% { 
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      0 4px 16px rgba(0, 0, 0, 0.1),
+      0 0 0 0 rgba(255, 138, 101, 0);
+  }
+  50% { 
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      0 4px 16px rgba(0, 0, 0, 0.1),
+      0 0 0 8px rgba(255, 138, 101, 0.1);
+  }
+}
+
+.glassmorphism-miniplayer.playing {
+  animation: warm-pulse 2s ease-in-out infinite;
+}
+
+/* Resize Handles */
+.glassmorphism-resize-handle {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  transition: all 0.2s ease;
+}
+
+.glassmorphism-resize-handle:hover {
+  background: rgba(255, 138, 101, 0.2);
+  border-color: rgba(255, 138, 101, 0.4);
+  transform: scale(1.1);
+}
+
+/* Loading Spinner */
+.glassmorphism-loading {
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-top: 2px solid var(--warm-orange);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .glassmorphism-miniplayer {
+    border-radius: 20px;
+  }
+  
+  .glassmorphism-thumbnail {
+    border-radius: 12px;
+  }
+  
+  .glassmorphism-control-btn {
+    border-radius: 8px;
+  }
+}
+
+/* Dark Mode Enhancements */
+@media (prefers-color-scheme: dark) {
+  .glassmorphism-miniplayer {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 0, 0, 0.3) 0%,
+      rgba(0, 0, 0, 0.1) 100%
+    );
+    border-color: rgba(255, 255, 255, 0.1);
+  }
+}
+
+/* Accessibility */
+.glassmorphism-miniplayer:focus-within {
+  outline: 2px solid var(--warm-orange);
+  outline-offset: 2px;
+}
+
+.glassmorphism-control-btn:focus {
+  outline: none;
+  box-shadow: 
+    0 0 0 2px rgba(255, 138, 101, 0.5),
+    0 4px 16px rgba(255, 138, 101, 0.3);
+}
+
+/* Smooth entry animation */
+.glassmorphism-miniplayer.entering {
+  animation: slideInScale 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+@keyframes slideInScale {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Input Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background: #3b82f6;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+            transition: background 0.2s;
+        }
+        .btn:hover {
+            background: #2563eb;
+        }
+        .file-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f9ff;
+            border-radius: 5px;
+            border-left: 4px solid #3b82f6;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>🎬 File Upload Test</h1>
+        <p>Testing file input functionality to diagnose upload issues:</p>
+        
+        <!-- Test 1: Direct file input -->
+        <div>
+            <h3>Test 1: Direct File Input</h3>
+            <input type="file" accept="video/*" id="direct-input" onchange="handleDirectFile(this)">
+        </div>
+        
+        <!-- Test 2: Button triggers hidden input -->
+        <div>
+            <h3>Test 2: Button + Hidden Input</h3>
+            <button class="btn" onclick="triggerHiddenInput()">Choose Video File</button>
+            <input type="file" accept="video/*" id="hidden-input" class="hidden" onchange="handleHiddenFile(this)" aria-label="Choose video file for upload test">
+        </div>
+        
+        <!-- Test 3: Label for input -->
+        <div>
+            <h3>Test 3: Label Method</h3>
+            <label for="label-input" class="btn" style="display: inline-block;">Browse Files (Label)</label>
+            <input type="file" accept="video/*" id="label-input" class="hidden" onchange="handleLabelFile(this)">
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function showResult(test, file) {
+            const results = document.getElementById('results');
+            const fileInfo = document.createElement('div');
+            fileInfo.className = 'file-info';
+            fileInfo.innerHTML = `
+                <h4>${test} - SUCCESS! ✅</h4>
+                <p><strong>File:</strong> ${file.name}</p>
+                <p><strong>Size:</strong> ${(file.size / (1024 * 1024)).toFixed(2)} MB</p>
+                <p><strong>Type:</strong> ${file.type}</p>
+                <p><strong>Last Modified:</strong> ${new Date(file.lastModified).toLocaleString()}</p>
+            `;
+            results.appendChild(fileInfo);
+        }
+        
+        function handleDirectFile(input) {
+            if (input.files && input.files[0]) {
+                showResult('Direct Input', input.files[0]);
+            }
+        }
+        
+        function handleHiddenFile(input) {
+            if (input.files && input.files[0]) {
+                showResult('Button + Hidden Input', input.files[0]);
+            }
+        }
+        
+        function handleLabelFile(input) {
+            if (input.files && input.files[0]) {
+                showResult('Label Method', input.files[0]);
+            }
+        }
+        
+        function triggerHiddenInput() {
+            console.log('Button clicked');
+            const input = document.getElementById('hidden-input');
+            console.log('Input element:', input);
+            if (input) {
+                try {
+                    input.click();
+                    console.log('Input clicked successfully');
+                } catch (error) {
+                    console.error('Error clicking input:', error);
+                    alert('Error: ' + error.message);
+                }
+            }
+        }
+        
+        // Test if click method is supported
+        console.log('Testing file input click support...');
+        const testInput = document.createElement('input');
+        testInput.type = 'file';
+        console.log('File input click method available:', typeof testInput.click === 'function');
+    </script>
+</body>
+</html>
