@@ -1038,6 +1038,32 @@ export function ReelsPage({ onNavigate }: ReelsPageProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [reelsData, setReelsData] = useState(DEMO_REELS);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMoreReels, setHasMoreReels] = useState(true);
+  const [loadingTimeout, setLoadingTimeout] = useState<NodeJS.Timeout | null>(null);
+
+  // Simulated fetch of more reels
+  const fetchMoreReels = async () => {
+    if (isLoading || !hasMoreReels) return;
+    
+    setIsLoading(true);
+    // Clear any existing timeout
+    if (loadingTimeout) {
+      clearTimeout(loadingTimeout);
+    }
+
+    // Simulate API call delay
+    const timeout = setTimeout(() => {
+      // For demo, we'll just show that there are no more reels after reaching the end
+      if (reelsData.length >= DEMO_REELS.length) {
+        setHasMoreReels(false);
+        toast.info("You've reached the end of available reels!");
+      }
+      setIsLoading(false);
+    }, 1500);
+
+    setLoadingTimeout(timeout);
+  };
 
   // Navigation functions
   const navigateToReel = (newIndex: number) => {
@@ -1051,10 +1077,23 @@ export function ReelsPage({ onNavigate }: ReelsPageProps) {
           top: newIndex * container.clientHeight,
           behavior: 'smooth'
         });
+
+        // Add haptic feedback if available
+        if (window.navigator.vibrate) {
+          window.navigator.vibrate(50);
+        }
+
+        // Check if we're near the end and should load more
+        if (newIndex >= reelsData.length - 3) {
+          fetchMoreReels();
+        }
       }
       
       // Reset navigation lock after smooth scroll completes
       setTimeout(() => setIsNavigating(false), 500);
+    } else if (newIndex >= reelsData.length) {
+      // At the end of available reels
+      toast.info("No more reels to show!");
     }
   };
 
@@ -1072,11 +1111,11 @@ export function ReelsPage({ onNavigate }: ReelsPageProps) {
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       if (isNavigating) return;
-      if (e.deltaY < 0) {
-        // Scroll up = next reel
+      if (e.deltaY > 0) {
+        // Scroll down = next reel
         navigateToReel(currentReelIndex + 1);
-      } else if (e.deltaY > 0) {
-        // Scroll down = previous reel
+      } else if (e.deltaY < 0) {
+        // Scroll up = previous reel
         navigateToReel(currentReelIndex - 1);
       }
     };
@@ -1098,11 +1137,19 @@ export function ReelsPage({ onNavigate }: ReelsPageProps) {
       startY = e.touches[0].clientY;
       startX = e.touches[0].clientX;
       isDragging = true;
+      touchStartTime = Date.now();
     };
 
+    let touchStartTime = 0;
     const handleTouchMove = (e: TouchEvent) => {
       if (!isDragging || isNavigating) return;
-      e.preventDefault();
+      const currentY = e.touches[0].clientY;
+      const deltaY = startY - currentY;
+      
+      // Only prevent default if there's significant vertical movement
+      if (Math.abs(deltaY) > 10) {
+        e.preventDefault();
+      }
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
@@ -1113,29 +1160,69 @@ export function ReelsPage({ onNavigate }: ReelsPageProps) {
       const endX = e.changedTouches[0].clientX;
       const deltaY = startY - endY;
       const deltaX = startX - endX;
+      
+      // Ignore very small movements (likely taps)
+      if (Math.abs(deltaY) < 10 && Math.abs(deltaX) < 10) {
+        return;
+      }
 
+      const touchEndTime = Date.now();
+      const touchDuration = touchEndTime - touchStartTime;
       const minSwipeDistance = 50;
+      const threshold = 0.3; // Threshold to determine if swipe is more horizontal or vertical
 
-      // Horizontal swipe (left = go to channel)
-      if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > minSwipeDistance) {
+      // Calculate velocity (pixels per millisecond)
+      const velocityY = Math.abs(deltaY) / touchDuration;
+      const velocityX = Math.abs(deltaX) / touchDuration;
+
+      // Calculate swipe direction ratio with velocity consideration
+      const isHorizontal = (Math.abs(deltaX) > Math.abs(deltaY) * threshold) &&
+                          (velocityX > 0.2); // Minimum horizontal velocity threshold
+
+      // Handle horizontal swipe (left = go to channel)
+      if (isHorizontal && Math.abs(deltaX) > minSwipeDistance) {
         if (deltaX > 0) {
-          // Swipe left - navigate to channel
+          // Swipe left - navigate to channel with animation
           const currentReel = reelsData[currentReelIndex];
           if (currentReel) {
-            navigateToChannel(currentReel.creator.id);
+            const container = containerRef.current;
+            if (container) {
+              const card = container.children[currentReelIndex] as HTMLElement;
+              if (card) {
+                card.style.transition = 'transform 0.3s ease-out';
+                card.style.transform = 'translateX(-100%)';
+                setTimeout(() => {
+                  card.style.transform = '';
+                  navigateToChannel(currentReel.creator.id);
+                }, 300);
+              }
+            }
           }
         }
         return;
       }
 
-      // Vertical swipe (up/down navigation)
-      if (Math.abs(deltaY) > minSwipeDistance) {
-        if (deltaY < 0) {
-          // Swipe up = next reel
-          navigateToReel(currentReelIndex + 1);
+      // Handle vertical swipe (up/down navigation) with momentum and velocity check
+      if (!isHorizontal && Math.abs(deltaY) > minSwipeDistance) {
+        const verticalVelocity = Math.abs(deltaY) / touchDuration;
+        // Only trigger navigation if swipe was fast enough
+        if (verticalVelocity > 0.3) { // Minimum vertical velocity threshold
+          if (deltaY > 0) {
+            // Swipe up = next reel
+            navigateToReel(currentReelIndex + 1);
+          } else {
+            // Swipe down = previous reel
+            navigateToReel(currentReelIndex - 1);
+          }
         } else {
-          // Swipe down = previous reel
-          navigateToReel(currentReelIndex - 1);
+          // If swipe was too slow, snap back to current reel
+          const container = containerRef.current;
+          if (container) {
+            container.scrollTo({
+              top: currentReelIndex * container.clientHeight,
+              behavior: 'smooth'
+            });
+          }
         }
       }
     };
@@ -1274,18 +1361,50 @@ export function ReelsPage({ onNavigate }: ReelsPageProps) {
       {/* Reels Feed */}
       <div
         ref={containerRef}
-        className="flex-1 h-full overflow-y-scroll scroll-smooth"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        className="flex-1 h-full overflow-y-scroll scroll-smooth snap-y snap-mandatory no-scrollbar"
       >
         <style>
           {`
-            div::-webkit-scrollbar {
+            .no-scrollbar {
+              scrollbar-width: none;
+              -ms-overflow-style: none;
+            }
+            .no-scrollbar::-webkit-scrollbar {
               display: none;
+            }
+
+            .reel-card {
+              transform-origin: center center;
+              touch-action: pan-y pinch-zoom;
+            }
+
+            .reel-card-enter {
+              transform: translateY(100%);
+              opacity: 0;
+            }
+            .reel-card-enter-active {
+              transform: translateY(0);
+              opacity: 1;
+              transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+            }
+            .reel-card-exit {
+              transform: translateY(0);
+              opacity: 1;
+            }
+            .reel-card-exit-active {
+              transform: translateY(-100%);
+              opacity: 0;
+              transition: transform 0.4s ease-out, opacity 0.4s ease-out;
             }
           `}
         </style>
         {reelsData.map((reel, index) => (
-          <div key={reel.id} className="w-full h-full snap-start">
+          <div 
+            key={reel.id} 
+            className={`w-full h-full snap-start reel-card ${
+              index === currentReelIndex ? 'scale-100' : 'scale-95'
+            } transition-all duration-300 ease-out`}
+          >
             <ReelCard
               reel={reel}
               isActive={index === currentReelIndex}
@@ -1299,6 +1418,20 @@ export function ReelsPage({ onNavigate }: ReelsPageProps) {
             />
           </div>
         ))}
+        
+        {/* Loading and End of Content Indicators */}
+        <div className="absolute bottom-20 left-0 right-0 flex justify-center z-50 pointer-events-none">
+          {isLoading && (
+            <div className="bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full">
+              Loading more reels...
+            </div>
+          )}
+          {!isLoading && !hasMoreReels && currentReelIndex === reelsData.length - 1 && (
+            <div className="bg-black/50 backdrop-blur-sm text-white px-4 py-2 rounded-full">
+              You've watched all available reels!
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

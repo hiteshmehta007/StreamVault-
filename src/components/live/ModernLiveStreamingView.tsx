@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Camera, 
-  Mic, 
-  MicOff, 
-  CameraOff, 
+import {
+  Camera,
+  Mic,
+  MicOff,
+  CameraOff,
   Heart,
   MessageCircle,
   Settings,
@@ -14,29 +14,28 @@ import {
   ThumbsUp,
   Gift,
   PhoneOff,
-  Pause,
-  Play,
   Users,
   Clock,
   Maximize2,
   Minimize2,
   Volume2,
   VolumeX,
-  MoreHorizontal,
   Smile,
-  Image,
   DollarSign,
   Star,
   TrendingUp,
   Zap,
   Award,
-  Shield
+  Shield,
+  Pause
 } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Dialog } from '../ui/dialog';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '../ui/avatar';
 import { toast } from 'sonner';
+import { DraggableChatBox } from './DraggableChatBox';
 
 interface ModernLiveStreamingViewProps {
   streamConfig?: any;
@@ -84,6 +83,11 @@ interface StreamStats {
  * - Accessibility-first approach with keyboard navigation
  */
 export function ModernLiveStreamingView({ streamConfig, user, onEndStream }: ModernLiveStreamingViewProps) {
+  // UI/UX for Settings and Share
+  const [showSettings, setShowSettings] = useState(false);
+  const [showShare, setShowShare] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
   // State management
   const [streamStats, setStreamStats] = useState<StreamStats>({
     viewers: Math.floor(Math.random() * 500) + 50,
@@ -93,9 +97,48 @@ export function ModernLiveStreamingView({ streamConfig, user, onEndStream }: Mod
     revenue: Math.floor(Math.random() * 100) + 10
   });
 
-  const [isStreaming, setIsStreaming] = useState(true);
+  const [isStreaming, setIsStreaming] = useState(true); // Used for stream state
   const [isPaused, setIsPaused] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showPauseButton, setShowPauseButton] = useState(true);
+  // Fullscreen logic
+  useEffect(() => {
+    if (!videoContainerRef.current) return;
+    if (isFullscreen) {
+      if (videoContainerRef.current.requestFullscreen) {
+        videoContainerRef.current.requestFullscreen();
+      }
+    } else {
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  }, [isFullscreen]);
+
+  // Share logic
+  const handleShare = async () => {
+    setShowShare(true);
+    const shareUrl = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: streamConfig?.title || 'Live Stream',
+          text: 'Check out this live stream!',
+          url: shareUrl
+        });
+        setShowShare(false);
+        toast.success('Stream shared!');
+      } catch (e) {
+        // fallback to dialog
+      }
+    }
+  };
+
+  const handleCopyShare = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setShareCopied(true);
+    setTimeout(() => setShareCopied(false), 2000);
+  };
   const [isMuted, setIsMuted] = useState(false);
   const [showControls, setShowControls] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(streamConfig?.camera ?? true);
@@ -167,7 +210,7 @@ export function ModernLiveStreamingView({ streamConfig, user, onEndStream }: Mod
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const commentsEndRef = useRef<HTMLDivElement>(null);
-  const controlsTimeoutRef = useRef<NodeJS.Timeout>();
+  const controlsTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Error handling
   if (!streamConfig) {
@@ -637,7 +680,7 @@ export function ModernLiveStreamingView({ streamConfig, user, onEndStream }: Mod
         {/* Main Content Area */}
         <div className="flex-1 flex overflow-hidden">
           {/* Video Area */}
-          <div className="flex-1 relative">
+          <div className="flex-1 relative" ref={videoContainerRef}>
             <motion.div 
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
@@ -648,15 +691,12 @@ export function ModernLiveStreamingView({ streamConfig, user, onEndStream }: Mod
               <div className="relative w-full h-full">
                 <video
                   ref={handleVideoRef}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover mirrored-video"
                   autoPlay
                   muted={true}
                   playsInline
-                  style={{ 
-                    transform: 'scaleX(-1)',
-                    backgroundColor: '#000'
-                  }}
                 />
+
                 
                 {/* Overlays based on state */}
                 {isInitializing && (
@@ -781,29 +821,91 @@ export function ModernLiveStreamingView({ streamConfig, user, onEndStream }: Mod
                       {/* Right Controls */}
                       <div className="flex items-center space-x-4">
                         <Button
-                          onClick={() => setIsFullscreen(!isFullscreen)}
+                          onClick={() => setIsFullscreen((f) => !f)}
                           variant="ghost"
                           size="lg"
-                          className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/20"
+                          aria-label={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
+                          className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/20 transition-all duration-200 focus:ring-2 focus:ring-purple-400"
+                          title={isFullscreen ? 'Exit Fullscreen' : 'Enter Fullscreen'}
                         >
                           {isFullscreen ? <Minimize2 className="w-6 h-6" /> : <Maximize2 className="w-6 h-6" />}
                         </Button>
 
                         <Button
+                          onClick={() => setShowSettings(true)}
                           variant="ghost"
                           size="lg"
-                          className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/20"
+                          aria-label="Settings"
+                          className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/20 transition-all duration-200 focus:ring-2 focus:ring-purple-400"
+                          title="Settings"
                         >
                           <Settings className="w-6 h-6" />
                         </Button>
 
                         <Button
+                          onClick={handleShare}
                           variant="ghost"
                           size="lg"
-                          className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/20"
+                          aria-label="Share"
+                          className="rounded-full w-14 h-14 bg-white/20 hover:bg-white/30 text-white backdrop-blur-md border border-white/20 transition-all duration-200 focus:ring-2 focus:ring-pink-400"
+                          title="Share Stream"
                         >
                           <Share2 className="w-6 h-6" />
                         </Button>
+          {/* Settings Modal */}
+          <AnimatePresence>
+            {showSettings && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 w-full max-w-md relative">
+                  <button onClick={() => setShowSettings(false)} className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-xl font-bold">×</button>
+                  <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Stream Settings</h2>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Video Quality</label>
+                      <select title="Video Quality" className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 p-2">
+                        <option>1080p (HD)</option>
+                        <option>720p</option>
+                        <option>480p</option>
+                        <option>360p</option>
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-gray-700 dark:text-gray-200 font-medium mb-1">Latency</label>
+                      <select title="Latency" className="w-full rounded-lg border-gray-300 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 p-2">
+                        <option>Normal</option>
+                        <option>Low</option>
+                        <option>Ultra Low</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="mt-6 flex justify-end">
+                    <Button onClick={() => setShowSettings(false)} className="bg-purple-500 hover:bg-purple-600 text-white rounded-lg px-6">Close</Button>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Share Modal */}
+          <AnimatePresence>
+            {showShare && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                <motion.div initial={{ scale: 0.95 }} animate={{ scale: 1 }} exit={{ scale: 0.95 }} className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8 w-full max-w-sm relative">
+                  <button onClick={() => setShowShare(false)} className="absolute top-3 right-3 text-gray-400 hover:text-red-500 text-xl font-bold">×</button>
+                  <h2 className="text-2xl font-bold mb-4 text-gray-900 dark:text-white">Share this Stream</h2>
+                  <div className="flex items-center space-x-2 mb-4">
+                    <input type="text" readOnly value={window.location.href} className="flex-1 rounded-lg border-gray-300 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 p-2 text-gray-700 dark:text-gray-200" />
+                    <Button onClick={handleCopyShare} className="bg-pink-500 hover:bg-pink-600 text-white rounded-lg px-4">
+                      {shareCopied ? 'Copied!' : 'Copy'}
+                    </Button>
+                  </div>
+                  <div className="flex justify-end">
+                    <Button onClick={() => setShowShare(false)} className="bg-gray-200 dark:bg-gray-800 text-gray-700 dark:text-gray-200 rounded-lg px-6">Close</Button>
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
                       </div>
                     </div>
                   </motion.div>
@@ -837,7 +939,9 @@ export function ModernLiveStreamingView({ streamConfig, user, onEndStream }: Mod
           <motion.div 
             initial={{ x: 300, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="w-96 bg-black/20 backdrop-blur-md border-l border-white/10 flex flex-col"
+            className={`w-96 bg-black/20 backdrop-blur-md border-l border-white/10 flex flex-col transition-all duration-500 z-40
+              ${isFullscreen ? 'fixed top-8 right-8 h-[80vh] shadow-2xl rounded-2xl border-white/30 border-2 animate-float-chat' : ''}`}
+            style={isFullscreen ? { pointerEvents: 'auto' } : {}}
           >
             {/* Chat Header */}
             <div className="flex-shrink-0 p-4 border-b border-white/10">
